@@ -32,6 +32,13 @@ if use_custom:
 system_instruction = custom_instruction.strip() if use_custom else PRESETS[selected_preset]
 st.session_state.system_intsruction = system_instruction
 
+# Added reruns:
+if st.sidebar.button("Reset Chat"):
+    st.session_state.messages = [
+        {"role":"assistant", "content":"Hi! I echo you."}
+    ]
+    st.rerun()
+
 #Calling api_key:
 api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
@@ -43,7 +50,8 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 
-model  = genai.GenerativeModel("gemini-2.5-flash")
+model  = genai.GenerativeModel("gemini-2.5-flash",
+                               system_instruction=st.session_state.system_instruction)
                             
 # def echo_greet():
 #     salutations =["Greet the user with a small casual sentence or two.", 

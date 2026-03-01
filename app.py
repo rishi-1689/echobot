@@ -8,6 +8,30 @@ load_dotenv()
 st.set_page_config(page_title="Lab 1 - Echo Chat", page_icon="💬")
 st.title("💬 Echo Chat")
 
+# Setting Presets:
+PRESETS= {"Trainer-Guy":"You are a motivational trainer.",
+          "Poet":"You are an artistic poet.",
+          "Geek":"You are an enthsiastic geek, who loves to elaborate and stretch his answers as long as possible.",
+          "German-fella":"You are a helpful assistant who gives all his answers in German."}
+
+# Customzing sidebar:
+st.sidebar.header("My Personalities.")
+
+selected_preset = st.sidebar.selectbox("Choose One: ",
+                                         list(PRESETS.keys()),
+                                         index=0)
+
+# Making your own:
+use_custom = st.sidebar.toggle("Create your own custom personality.", value=False)
+
+
+custom_instruction=""
+if use_custom:
+    custom_instruction = st.sidebar.text_area("Your instructions please.")
+
+system_instruction = custom_instruction.strip() if use_custom else PRESETS[selected_preset]
+st.session_state.system_intsruction = system_instruction
+
 #Calling api_key:
 api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:

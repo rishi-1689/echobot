@@ -8,7 +8,7 @@ load_dotenv()
 st.set_page_config(page_title="Lab 1 - Echo Chat", page_icon="💬")
 st.title("💬 Echo Chat")
 
-if "system instruction" not in st.session_state:
+if "system_instruction" not in st.session_state:
     st.session_state.system.instruction = "You are a helpful assistant."
 
 # Setting Presets:

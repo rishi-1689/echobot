@@ -8,8 +8,7 @@ load_dotenv()
 st.set_page_config(page_title="Lab 1 - Echo Chat", page_icon="💬")
 st.title("💬 Echo Chat")
 
-if "system_instruction" not in st.session_state:
-    st.session_state.system.instruction = "You are a helpful assistant."
+
 
 # Setting Presets:
 PRESETS= {"Trainer-Guy":"You are a motivational trainer.",
@@ -33,7 +32,7 @@ if use_custom:
     custom_instruction = st.sidebar.text_area("Your instructions please.")
 
 system_instruction = custom_instruction.strip() if use_custom else PRESETS[selected_preset]
-st.session_state.system_intsruction = system_instruction
+
 
 # Added reruns:
 if st.sidebar.button("Reset Chat"):
@@ -54,7 +53,7 @@ genai.configure(api_key=api_key)
 
 
 model  = genai.GenerativeModel("gemini-2.5-flash",
-                               system_instruction=st.session_state.system_instruction)
+                               system_instruction=system_instruction)
                             
 # def echo_greet():
 #     salutations =["Greet the user with a small casual sentence or two.", 

@@ -1,7 +1,7 @@
 import streamlit as st
 import random
 import os
-import google.generativeai as genai
+
 from dotenv import load_dotenv
 from pypdf import PdfReader
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -13,6 +13,7 @@ st.title("💬 Echo Chat")
 
 # testing if module works:
 try:
+    import google.generativeai as genai
     st.sidebar.success("google.generativeai imported ✅")
 except Exception as e:
     st.sidebar.error(f"Failed to import google.generativeai: {e!r}")

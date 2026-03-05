@@ -3,10 +3,48 @@ import random
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv
+from pypdf import PdfReader
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity 
 load_dotenv()
 
 st.set_page_config(page_title="Lab 1 - Echo Chat", page_icon="💬")
 st.title("💬 Echo Chat")
+
+# extracting text:
+def pdf_extract_text(uploaded_file) -> str:
+    reader = PdfReader(uploaded_file)
+    return "\n\n".join([(p.extract_text() or "") for p in reader.pages])
+
+# turning extracted texts into chunks:
+def chunk_text(text, chunk_size=1200, overlap=200):
+    chunks=[]
+    start=0
+    while start<len(text):
+        end = min(start + chunk_size, len(text))
+        chunk = text[start:end].strip()
+        if chunk:
+            chunks.append(chunk)
+            start = end - overlap
+            if end == len(text):
+                break
+    return chunks
+
+def build_tfidf_index(chunks):
+    vec = TfidfVectorizer(
+        ngram_range=(1,2),
+        min_df=1
+    )
+
+    X =vec.fit_transform(chunks)
+    return vec, X
+
+def retrieve_top_k(query, chunks, vec, X, k=4):
+    Q = vec.transform([query])
+    scores = cosine_similarity(Q, X)[0]
+    top_score = scores.argsort()[::-1][:k]
+    return[(int(i), float(scores[i]), chunks[int[i]]) for i in top_score]
+
 
 
 
@@ -22,6 +60,15 @@ st.sidebar.header("My Personalities.")
 selected_preset = st.sidebar.selectbox("Choose One: ",
                                          list(PRESETS.keys()),
                                          index=0)
+
+
+# upload pdf:
+st.sidebar.header("Upload a PDF")
+
+uploaded_pdf = st.sidebar.file_uploader(
+    "Upload a PDF document",
+    type=["pdf"]
+)
 
 # Making your own:
 use_custom = st.sidebar.toggle("Create your own custom personality.", value=False)

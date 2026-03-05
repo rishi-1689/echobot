@@ -11,6 +11,13 @@ load_dotenv()
 st.set_page_config(page_title="Lab 1 - Echo Chat", page_icon="💬")
 st.title("💬 Echo Chat")
 
+# testing if module works:
+try:
+    st.sidebar.success("google.generativeai imported ✅")
+except Exception as e:
+    st.sidebar.error(f"Failed to import google.generativeai: {e!r}")
+    st.stop()
+
 # extracting text:
 def pdf_extract_text(uploaded_file) -> str:
     reader = PdfReader(uploaded_file)

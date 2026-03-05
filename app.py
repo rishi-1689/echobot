@@ -52,7 +52,7 @@ def retrieve_top_k(query, chunks, vec, X, k=4):
     Q = vec.transform([query])
     scores = cosine_similarity(Q, X)[0]
     top_score = scores.argsort()[::-1][:k]
-    return[(int(i), float(scores[i]), chunks[int[i]]) for i in top_score]
+    return[(int(i), float(scores[i]), chunks[int(i)]) for i in top_score]
 
 
 

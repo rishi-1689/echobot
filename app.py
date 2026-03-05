@@ -47,6 +47,7 @@ def build_tfidf_index(chunks):
     X =vec.fit_transform(chunks)
     return vec, X
 
+# Retrieving top-k:
 def retrieve_top_k(query, chunks, vec, X, k=4):
     Q = vec.transform([query])
     scores = cosine_similarity(Q, X)[0]
@@ -77,6 +78,21 @@ uploaded_pdf = st.sidebar.file_uploader(
     "Upload a PDF document",
     type=["pdf"]
 )
+
+# Making sure pdf exists:
+if uploaded_pdf is not None:
+    if st.session_state.get("pdf_name") != uploaded_pdf.name:
+        text = pdf_extract_text(uploaded_pdf)
+        chunks = chunk_text(text)
+        vec, X = build_tfidf_index(chunks)
+
+        st.session_state.vec = vec
+        st.session_state.X = X
+        st.session_state.chunks = chunks
+        st.session_state.pdf_name = uploaded_pdf.name
+
+
+
 
 # Making your own:
 use_custom = st.sidebar.toggle("Create your own custom personality.", value=False)
@@ -134,12 +150,49 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
 
 prompt = st.chat_input("Say something")
+
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
-    
-    # greet = echo_greet()
-    response = model.generate_content(prompt)
 
-    st.session_state.messages.append({"role": "assistant", "content": f"{response.text}" })
+    
+    # RAG retrieval step
+    context = ""
+
+    if "vec" in st.session_state and "X" in st.session_state and "chunks" in st.session_state:
+
+        results = retrieve_top_k(
+            prompt,
+            st.session_state.chunks,
+            st.session_state.vec,
+            st.session_state.X,
+            k=4
+        )
+
+        context = "\n\n".join([chunk for _, _, chunk in results])
+
+ 
+    # Build final prompt with context
+    final_prompt = f"""
+You have access to excerpts from a PDF.
+
+Use them to answer the question.
+
+If the answer is not in the excerpts, say:
+"Not found in the PDF."
+
+PDF EXCERPTS:
+{context}
+
+QUESTION:
+{prompt}
+"""
+
+    
+    # Call Gemini with context
+    response = model.generate_content(final_prompt)
+
+    st.session_state.messages.append(
+        {"role": "assistant", "content": f"{response.text}"}
+    )
 
     st.rerun()

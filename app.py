@@ -170,22 +170,21 @@ if prompt:
 
         context = "\n\n".join([chunk for _, _, chunk in results])
 
- 
     # Build final prompt with context
-    final_prompt = f"""
-You have access to excerpts from a PDF.
+    if context:
+        final_prompt = f"""
+    You have access to excerpts from a PDF.
+    Use them to answer the question.
+    If the answer is not in the excerpts, say: "Not found in the PDF."
 
-Use them to answer the question.
+    PDF EXCERPTS:
+    {context}
 
-If the answer is not in the excerpts, say:
-"Not found in the PDF."
-
-PDF EXCERPTS:
-{context}
-
-QUESTION:
-{prompt}
-"""
+    QUESTION:
+    {prompt}
+    """
+    else:
+        final_prompt = prompt
 
     
     # Call Gemini with context

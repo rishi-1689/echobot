@@ -1,0 +1,33 @@
+# Python cache — never needed inside the container
+__pycache__/
+*.py[oc]
+*.pyo
+
+# Virtual environments — the container installs its own deps via pip
+.venv
+venv
+env
+
+# Build artifacts
+build/
+dist/
+wheels/
+*.egg-info
+
+# Local env file — secrets are injected via docker-compose environment block
+.env
+.env.local
+
+# Version manager file — only relevant on the host machine
+.python-version
+
+# Git history
+.git
+.gitignore
+
+# Backup files
+*.bak
+
+# OS clutter
+.DS_Store
+Thumbs.db
